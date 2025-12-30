@@ -54,47 +54,30 @@ export default function StoryDetailPage() {
           setAnalyzing(true);
           setAnalyzeError(null);
 
-          supabase.auth
-            .getUser()
-            .then(({ data: { user } }) => {
-              if (!user || !mounted) {
-                setAnalyzing(false);
-                return;
-              }
+          supabase.auth.getUser().then(({ data: { user } }) => {
+            if (!user || !mounted) {
+              setAnalyzing(false);
+              return;
+            }
 
-              analyzeStory({
-                storyId: id,
-                storyText: fetchedStory.freeform_text,
-                userId: user.id,
-                onError: (error) => {
-                  if (mounted) {
-                    setAnalyzeError(error);
-                  }
-                },
-              })
-                .then((result) => {
-                  if (mounted && result) {
-                    setStoryDetails(result);
-                  }
-                  if (mounted) {
-                    setAnalyzing(false);
-                  }
-                })
-                .catch((error) => {
-                  if (mounted) {
-                    console.error('Error analyzing story:', error);
-                    setAnalyzeError('Failed to analyze story');
-                    setAnalyzing(false);
-                  }
-                });
-            })
-            .catch((error) => {
+            analyzeStory({
+              storyId: id,
+              storyText: fetchedStory.freeform_text,
+              userId: user.id,
+              onError: (error) => {
+                if (mounted) {
+                  setAnalyzeError(error);
+                }
+              },
+            }).then((result) => {
+              if (mounted && result) {
+                setStoryDetails(result);
+              }
               if (mounted) {
-                console.error('Error getting user:', error);
-                setAnalyzeError('Failed to authenticate user');
                 setAnalyzing(false);
               }
             });
+          });
         }
       })
       .catch((error) => {
@@ -179,33 +162,26 @@ export default function StoryDetailPage() {
               setAnalyzing(true);
               setAnalyzeError(null);
 
-              try {
-                const {
-                  data: { user },
-                } = await supabase.auth.getUser();
-                if (!user) {
-                  setAnalyzing(false);
-                  return;
-                }
-
-                const result = await analyzeStory({
-                  storyId: story.id,
-                  storyText: story.freeform_text,
-                  userId: user.id,
-                  onError: (error) => {
-                    setAnalyzeError(error);
-                  },
-                });
-
-                if (result) {
-                  setStoryDetails(result);
-                }
-              } catch (error) {
-                console.error('Error re-analyzing story:', error);
-                setAnalyzeError('Failed to re-analyze story');
-              } finally {
+              const {
+                data: { user },
+              } = await supabase.auth.getUser();
+              if (!user) {
                 setAnalyzing(false);
               }
+
+              const result = await analyzeStory({
+                storyId: story.id,
+                storyText: story.freeform_text,
+                userId: user.id,
+                onError: (error) => {
+                  setAnalyzeError(error);
+                },
+              });
+
+              if (result) {
+                setStoryDetails(result);
+              }
+              setAnalyzing(false);
             }}
             disabled={analyzing}
             className="text-muted-foreground"
@@ -255,32 +231,25 @@ export default function StoryDetailPage() {
                   setAnalyzing(true);
                   setAnalyzeError(null);
 
-                  try {
-                    const {
-                      data: { user },
-                    } = await supabase.auth.getUser();
-                    if (!user) {
-                      setAnalyzing(false);
-                      return;
-                    }
-
-                    const result = await analyzeStory({
-                      storyId: story.id,
-                      storyText: story.freeform_text,
-                      userId: user.id,
-                      onError: (error) => {
-                        setAnalyzeError(error);
-                      },
-                    });
-
-                    if (result) {
-                      setStoryDetails(result);
-                    }
-                  } catch (error) {
-                    console.error('Error re-analyzing story:', error);
-                    setAnalyzeError('Failed to re-analyze story');
-                  } finally {
+                  const {
+                    data: { user },
+                  } = await supabase.auth.getUser();
+                  if (!user) {
                     setAnalyzing(false);
+                    return;
+                  }
+
+                  const result = await analyzeStory({
+                    storyId: story.id,
+                    storyText: story.freeform_text,
+                    userId: user.id,
+                    onError: (error) => {
+                      setAnalyzeError(error);
+                    },
+                  });
+
+                  if (result) {
+                    setStoryDetails(result);
                   }
                 }}
                 disabled={analyzing}

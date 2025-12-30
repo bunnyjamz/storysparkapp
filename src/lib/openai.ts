@@ -20,14 +20,7 @@ export type OpenAIError = {
 };
 
 export function isOpenAIError(error: unknown): error is OpenAIError {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'message' in error &&
-    typeof (error as any).message === 'string' &&
-    'status' in error &&
-    typeof (error as any).status === 'number'
-  );
+  return typeof error === 'object' && error !== null && 'message' in error && 'status' in error;
 }
 
 export function getOpenAIErrorMessage(error: unknown): string {
