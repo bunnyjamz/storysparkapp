@@ -3,7 +3,9 @@ import OpenAI from 'openai';
 const openaiApiKey = import.meta.env.VITE_OPENAI_API_KEY;
 
 if (!openaiApiKey) {
-  console.warn('OpenAI API key missing. AI features will not work. Set VITE_OPENAI_API_KEY in .env.local');
+  console.warn(
+    'OpenAI API key missing. AI features will not work. Set VITE_OPENAI_API_KEY in .env.local',
+  );
 }
 
 export const openai = new OpenAI({
@@ -18,12 +20,7 @@ export type OpenAIError = {
 };
 
 export function isOpenAIError(error: unknown): error is OpenAIError {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'message' in error &&
-    'status' in error
-  );
+  return typeof error === 'object' && error !== null && 'message' in error && 'status' in error;
 }
 
 export function getOpenAIErrorMessage(error: unknown): string {

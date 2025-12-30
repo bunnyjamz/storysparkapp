@@ -4,7 +4,16 @@ import { supabase } from '@/lib/supabase';
 import { Story, StoryDetails } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, Calendar, MapPin, Tag, Trash2, Sparkles, RefreshCw, AlertCircle } from 'lucide-react';
+import {
+  ChevronLeft,
+  Calendar,
+  MapPin,
+  Tag,
+  Trash2,
+  Sparkles,
+  RefreshCw,
+  AlertCircle,
+} from 'lucide-react';
 import { EditableField, EditableArrayField } from '@/components/editable-field';
 import { StoryDetailsSkeleton, AnalyzingSkeleton } from '@/components/skeleton';
 import { analyzeStory, updateStoryDetails, fetchStoryWithDetails } from '@/lib/analyze-story';
@@ -12,7 +21,7 @@ import { analyzeStory, updateStoryDetails, fetchStoryWithDetails } from '@/lib/a
 export default function StoryDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  
+
   const [story, setStory] = useState<Story | null>(null);
   const [storyDetails, setStoryDetails] = useState<StoryDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,56 +36,58 @@ export default function StoryDetailPage() {
 
   useEffect(() => {
     if (!id) return;
-    
+
     let mounted = true;
     const timeoutId = setTimeout(() => {
       setLoading(true);
     });
-    
-    loadStoryData(id).then(({ fetchedStory, details }) => {
-      if (!mounted) return;
-      setStory(fetchedStory);
-      setStoryDetails(details);
-      setLoading(false);
-      
-      // Auto-analyze if no details exist
-      if (!details && fetchedStory) {
-        setAnalyzing(true);
-        setAnalyzeError(null);
-        
-        supabase.auth.getUser().then(({ data: { user } }) => {
-          if (!user || !mounted) {
-            setAnalyzing(false);
-            return;
-          }
-          
-          analyzeStory({
-            storyId: id,
-            storyText: fetchedStory.freeform_text,
-            userId: user.id,
-            onError: (error) => {
-              if (mounted) {
-                setAnalyzeError(error);
-              }
-            },
-          }).then((result) => {
-            if (mounted && result) {
-              setStoryDetails(result);
-            }
-            if (mounted) {
-              setAnalyzing(false);
-            }
-          });
-        });
-      }
-    }).catch((error) => {
-      if (mounted) {
-        console.error('Error loading story:', error);
-        navigate('/');
+
+    loadStoryData(id)
+      .then(({ fetchedStory, details }) => {
+        if (!mounted) return;
+        setStory(fetchedStory);
+        setStoryDetails(details);
         setLoading(false);
-      }
-    });
-    
+
+        // Auto-analyze if no details exist
+        if (!details && fetchedStory) {
+          setAnalyzing(true);
+          setAnalyzeError(null);
+
+          supabase.auth.getUser().then(({ data: { user } }) => {
+            if (!user || !mounted) {
+              setAnalyzing(false);
+              return;
+            }
+
+            analyzeStory({
+              storyId: id,
+              storyText: fetchedStory.freeform_text,
+              userId: user.id,
+              onError: (error) => {
+                if (mounted) {
+                  setAnalyzeError(error);
+                }
+              },
+            }).then((result) => {
+              if (mounted && result) {
+                setStoryDetails(result);
+              }
+              if (mounted) {
+                setAnalyzing(false);
+              }
+            });
+          });
+        }
+      })
+      .catch((error) => {
+        if (mounted) {
+          console.error('Error loading story:', error);
+          navigate('/');
+          setLoading(false);
+        }
+      });
+
     return () => {
       mounted = false;
       clearTimeout(timeoutId);
@@ -86,10 +97,7 @@ export default function StoryDetailPage() {
   const handleDelete = async () => {
     if (!story || !window.confirm('Are you sure you want to delete this story?')) return;
 
-    const { error } = await supabase
-      .from('stories')
-      .delete()
-      .eq('id', story.id);
+    const { error } = await supabase.from('stories').delete().eq('id', story.id);
 
     if (error) {
       alert('Error deleting story: ' + error.message);
@@ -100,10 +108,10 @@ export default function StoryDetailPage() {
 
   const handleFieldSave = async (field: keyof StoryDetails, value: string | string[]) => {
     if (!story) return;
-    
+
     const success = await updateStoryDetails(story.id, { [field]: value });
     if (success) {
-      setStoryDetails((prev) => prev ? { ...prev, [field]: value } : null);
+      setStoryDetails((prev) => (prev ? { ...prev, [field]: value } : null));
     }
   };
 
@@ -153,13 +161,15 @@ export default function StoryDetailPage() {
               if (!story) return;
               setAnalyzing(true);
               setAnalyzeError(null);
-              
-              const { data: { user } } = await supabase.auth.getUser();
+
+              const {
+                data: { user },
+              } = await supabase.auth.getUser();
               if (!user) {
                 setAnalyzing(false);
                 return;
               }
-              
+
               const result = await analyzeStory({
                 storyId: story.id,
                 storyText: story.freeform_text,
@@ -168,7 +178,7 @@ export default function StoryDetailPage() {
                   setAnalyzeError(error);
                 },
               });
-              
+
               if (result) {
                 setStoryDetails(result);
               }
@@ -180,7 +190,12 @@ export default function StoryDetailPage() {
             <Sparkles className="h-4 w-4 mr-1" />
             Re-analyze
           </Button>
-          <Button variant="ghost" size="icon" onClick={handleDelete} className="text-destructive hover:bg-destructive/10">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleDelete}
+            className="text-destructive hover:bg-destructive/10"
+          >
             <Trash2 className="h-5 w-5" />
           </Button>
         </div>
@@ -216,13 +231,15 @@ export default function StoryDetailPage() {
                   if (!story) return;
                   setAnalyzing(true);
                   setAnalyzeError(null);
-                  
-                  const { data: { user } } = await supabase.auth.getUser();
+
+                  const {
+                    data: { user },
+                  } = await supabase.auth.getUser();
                   if (!user) {
                     setAnalyzing(false);
                     return;
                   }
-                  
+
                   const result = await analyzeStory({
                     storyId: story.id,
                     storyText: story.freeform_text,
@@ -231,7 +248,7 @@ export default function StoryDetailPage() {
                       setAnalyzeError(error);
                     },
                   });
-                  
+
                   if (result) {
                     setStoryDetails(result);
                   }
@@ -260,11 +277,9 @@ export default function StoryDetailPage() {
             className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-3"
           >
             <span className="text-base">ORIGINAL STORY</span>
-            <span className="text-xs">
-              {showOriginalStory ? '(hide)' : '(show)'}
-            </span>
+            <span className="text-xs">{showOriginalStory ? '(hide)' : '(show)'}</span>
           </button>
-          
+
           {showOriginalStory && (
             <div className="bg-background rounded-xl border shadow-sm overflow-hidden">
               <div className="p-6">
@@ -374,11 +389,11 @@ export default function StoryDetailPage() {
               <span className="text-sm">Original</span>
               <Badge variant="secondary">Current</Badge>
             </button>
-            
+
             <div className="w-full px-4 py-3 rounded-lg border border-dashed border-muted-foreground/30 bg-muted/20 flex items-center justify-center text-muted-foreground">
               <span className="text-sm">Cleaned version (Phase 3)</span>
             </div>
-            
+
             <div className="w-full px-4 py-3 rounded-lg border border-dashed border-muted-foreground/30 bg-muted/20 flex items-center justify-center text-muted-foreground">
               <span className="text-sm">AI Structure Rewrite (Phase 3)</span>
             </div>
@@ -388,7 +403,7 @@ export default function StoryDetailPage() {
         {/* Tags */}
         {story.tags && story.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 pt-8 mt-8 border-t">
-            {story.tags.map(tag => (
+            {story.tags.map((tag) => (
               <Badge key={tag} variant="secondary">
                 <Tag className="h-3 w-3 mr-1" />
                 {tag}
@@ -403,7 +418,5 @@ export default function StoryDetailPage() {
 
 // Simple skeleton component inline
 function Skeleton({ className }: { className?: string }) {
-  return (
-    <div className={`animate-pulse rounded-md bg-muted ${className}`} />
-  );
+  return <div className={`animate-pulse rounded-md bg-muted ${className}`} />;
 }
