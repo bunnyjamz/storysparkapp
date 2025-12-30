@@ -62,19 +62,10 @@ export function EditableField({
         <div className="flex items-center justify-between">
           <label className="text-sm font-medium text-foreground">{label}</label>
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleCancel}
-              disabled={isSaving}
-            >
+            <Button variant="ghost" size="sm" onClick={handleCancel} disabled={isSaving}>
               Cancel
             </Button>
-            <Button
-              size="sm"
-              onClick={handleSave}
-              disabled={isSaving}
-            >
+            <Button size="sm" onClick={handleSave} disabled={isSaving}>
               {isSaving ? (
                 <>
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent mr-1" />
@@ -91,12 +82,11 @@ export function EditableField({
         </div>
         <InputComponent
           value={editValue}
-          onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setEditValue(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+            setEditValue(e.target.value)
+          }
           placeholder={placeholder}
-          className={cn(
-            multiline && 'min-h-[80px] resize-none',
-            'transition-all'
-          )}
+          className={cn(multiline && 'min-h-[80px] resize-none', 'transition-all')}
           autoFocus
           disabled={isSaving}
         />
@@ -190,19 +180,10 @@ export function EditableArrayField({
         <div className="flex items-center justify-between">
           <label className="text-sm font-medium text-foreground">{label}</label>
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleCancel}
-              disabled={isSaving}
-            >
+            <Button variant="ghost" size="sm" onClick={handleCancel} disabled={isSaving}>
               Cancel
             </Button>
-            <Button
-              size="sm"
-              onClick={handleSave}
-              disabled={isSaving}
-            >
+            <Button size="sm" onClick={handleSave} disabled={isSaving}>
               {isSaving ? (
                 <>
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent mr-1" />

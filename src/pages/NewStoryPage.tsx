@@ -11,25 +11,21 @@ import { Calendar as CalendarIcon, MapPin, Tag, ChevronLeft, HelpCircle } from '
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const placeholders = [
   "Tell this like you're talking to a friend. What happened?",
   "What's the moment that made this worth telling?",
-  "Who was there, and what went wrong or changed?",
-  "Start anywhere. You can clean it up later.",
-  "If someone asked 'then what happened?', what would you say?"
+  'Who was there, and what went wrong or changed?',
+  'Start anywhere. You can clean it up later.',
+  "If someone asked 'then what happened?', what would you say?",
 ];
 
 const helpPrompts = [
-  "What kicked this off?",
-  "What surprised you?",
-  "What did you feel or realise?",
-  "How did it end?"
+  'What kicked this off?',
+  'What surprised you?',
+  'What did you feel or realise?',
+  'How did it end?',
 ];
 
 export default function NewStoryPage() {
@@ -42,7 +38,7 @@ export default function NewStoryPage() {
   const [freeformText, setFreeformText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [showHelp, setShowHelp] = useState(false);
 
@@ -56,14 +52,17 @@ export default function NewStoryPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!freeformText.trim()) {
-      setError("Please share your story. This field is required.");
+      setError('Please share your story. This field is required.');
       return;
     }
 
     setLoading(true);
     setError(null);
 
-    const tagArray = tags.split(',').map(t => t.trim()).filter(t => t !== '');
+    const tagArray = tags
+      .split(',')
+      .map((t) => t.trim())
+      .filter((t) => t !== '');
 
     const { error } = await supabase.from('stories').insert({
       user_id: user?.id,
@@ -107,9 +106,11 @@ export default function NewStoryPage() {
                   {error}
                 </div>
               )}
-              
+
               <div className="space-y-2">
-                <Label htmlFor="title" className="text-muted-foreground font-normal">Title (optional)</Label>
+                <Label htmlFor="title" className="text-muted-foreground font-normal">
+                  Title (optional)
+                </Label>
                 <Input
                   id="title"
                   placeholder="A memorable name for this story"
@@ -120,18 +121,20 @@ export default function NewStoryPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2 flex flex-col">
-                  <Label htmlFor="date" className="text-muted-foreground font-normal">When did it happen?</Label>
+                  <Label htmlFor="date" className="text-muted-foreground font-normal">
+                    When did it happen?
+                  </Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
-                        variant={"outline"}
+                        variant={'outline'}
                         className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !date && "text-muted-foreground"
+                          'w-full justify-start text-left font-normal',
+                          !date && 'text-muted-foreground',
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date ? format(date, "PPP") : <span>Pick a date</span>}
+                        {date ? format(date, 'PPP') : <span>Pick a date</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -146,7 +149,9 @@ export default function NewStoryPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="setting" className="text-muted-foreground font-normal">Setting (where/when)</Label>
+                  <Label htmlFor="setting" className="text-muted-foreground font-normal">
+                    Setting (where/when)
+                  </Label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -161,7 +166,9 @@ export default function NewStoryPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="tags" className="text-muted-foreground font-normal">Tags (comma separated)</Label>
+                <Label htmlFor="tags" className="text-muted-foreground font-normal">
+                  Tags (comma separated)
+                </Label>
                 <div className="relative">
                   <Tag className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -176,17 +183,19 @@ export default function NewStoryPage() {
 
               <div className="space-y-2 pt-4">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="story" className="text-base font-semibold">The Story*</Label>
-                  <button 
-                    type="button" 
+                  <Label htmlFor="story" className="text-base font-semibold">
+                    The Story*
+                  </Label>
+                  <button
+                    type="button"
                     onClick={() => setShowHelp(!showHelp)}
                     className="text-xs text-primary flex items-center hover:underline"
                   >
                     <HelpCircle className="h-3 w-3 mr-1" />
-                    {showHelp ? "Hide help" : "Need help?"}
+                    {showHelp ? 'Hide help' : 'Need help?'}
                   </button>
                 </div>
-                
+
                 {showHelp && (
                   <div className="bg-primary/5 p-3 rounded-md text-sm text-primary space-y-1 mb-2 animate-in fade-in slide-in-from-top-1">
                     <p className="font-semibold mb-1">Try focusing on:</p>
@@ -201,7 +210,11 @@ export default function NewStoryPage() {
                 <Textarea
                   id="story"
                   className="min-h-[250px] text-base resize-none"
-                  placeholder={showHelp ? "Use the prompts above to guide you..." : placeholders[placeholderIndex]}
+                  placeholder={
+                    showHelp
+                      ? 'Use the prompts above to guide you...'
+                      : placeholders[placeholderIndex]
+                  }
                   value={freeformText}
                   onChange={(e) => setFreeformText(e.target.value)}
                   required
@@ -210,7 +223,7 @@ export default function NewStoryPage() {
             </CardContent>
             <CardFooter>
               <Button type="submit" className="w-full" size="lg" disabled={loading}>
-                {loading ? "Saving story..." : "Save Story"}
+                {loading ? 'Saving story...' : 'Save Story'}
               </Button>
             </CardFooter>
           </Card>
