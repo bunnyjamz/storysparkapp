@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
@@ -78,6 +78,8 @@ export default function NewStoryPage() {
       setError(error.message);
       setLoading(false);
     } else {
+      // Story saved successfully, navigate to dashboard
+      // AI analysis will be triggered automatically when viewing the story detail
       navigate('/');
     }
   };

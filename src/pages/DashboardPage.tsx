@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
@@ -6,7 +6,7 @@ import { Story } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, LogOut, Calendar, MapPin, ChevronRight, SortAsc, SortDesc } from 'lucide-react';
+import { Plus, LogOut, Calendar, MapPin, SortAsc, SortDesc } from 'lucide-react';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -24,11 +24,7 @@ export default function DashboardPage() {
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
-  useEffect(() => {
-    fetchStories();
-  }, [sortField, sortOrder]);
-
-  async function fetchStories() {
+  const fetchStories = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from('stories')
@@ -41,7 +37,11 @@ export default function DashboardPage() {
       setStories(data || []);
     }
     setLoading(false);
-  }
+  }, [sortField, sortOrder]);
+
+  useEffect(() => {
+    fetchStories();
+  }, [fetchStories]);
 
   const toggleSortOrder = () => {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
