@@ -167,6 +167,7 @@ export default function StoryDetailPage() {
               } = await supabase.auth.getUser();
               if (!user) {
                 setAnalyzing(false);
+                return;
               }
 
               const result = await analyzeStory({
