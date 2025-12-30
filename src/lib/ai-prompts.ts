@@ -66,20 +66,18 @@ Return valid JSON only:
 export function formatStoryAnalysisPrompt(storyText: string): string {
   // Truncate story if too long (approx 4000 tokens max for gpt-3.5-turbo)
   const maxLength = 8000;
-  const truncatedText = storyText.length > maxLength 
-    ? storyText.substring(0, maxLength) + '...'
-    : storyText;
-  
+  const truncatedText =
+    storyText.length > maxLength ? storyText.substring(0, maxLength) + '...' : storyText;
+
   return STORY_ANALYSIS_PROMPT.replace('{STORY_TEXT}', truncatedText);
 }
 
 // Format the cleanup prompt with the story text
 export function formatCleanupPrompt(storyText: string): string {
   const maxLength = 8000;
-  const truncatedText = storyText.length > maxLength 
-    ? storyText.substring(0, maxLength) + '...'
-    : storyText;
-  
+  const truncatedText =
+    storyText.length > maxLength ? storyText.substring(0, maxLength) + '...' : storyText;
+
   return STORY_CLEANUP_PROMPT.replace('{STORY_TEXT}', truncatedText);
 }
 
@@ -88,17 +86,17 @@ export function parseStoryAnalysisResponse(response: string): Partial<StoryAnaly
   try {
     // Try to parse the raw response
     let cleanedResponse = response.trim();
-    
+
     // Remove markdown code block fences if present
     cleanedResponse = cleanedResponse.replace(/^```json?\s*/i, '');
     cleanedResponse = cleanedResponse.replace(/\s*```$/i, '');
-    
+
     const parsed = JSON.parse(cleanedResponse) as Partial<StoryAnalysisResult>;
-    
+
     // Normalize the response - convert "Unclear" to empty strings
     const normalized: Partial<StoryAnalysisResult> = {
-      characters: Array.isArray(parsed.characters) 
-        ? parsed.characters.filter(c => c && c !== 'Unclear')
+      characters: Array.isArray(parsed.characters)
+        ? parsed.characters.filter((c) => c && c !== 'Unclear')
         : [],
       hook: normalizeField(parsed.hook),
       beginning: normalizeField(parsed.beginning),
@@ -108,7 +106,7 @@ export function parseStoryAnalysisResponse(response: string): Partial<StoryAnaly
       lesson_or_takeaway: normalizeField(parsed.lesson_or_takeaway),
       turning_point: normalizeField(parsed.turning_point),
     };
-    
+
     return normalized;
   } catch (error) {
     console.error('Failed to parse AI response:', error);

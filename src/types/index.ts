@@ -21,7 +21,7 @@ export interface StoryVersion {
   id: string;
   story_id: string;
   version_type: string;
-  content: any;
+  content: Record<string, unknown>;
   created_at: string;
 }
 

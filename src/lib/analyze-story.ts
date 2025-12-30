@@ -7,7 +7,6 @@ export interface AnalyzeStoryOptions {
   storyId: string;
   storyText: string;
   userId: string;
-  onSuccess?: () => void;
   onError?: (error: string) => void;
 }
 
@@ -22,19 +21,20 @@ export async function analyzeStory(options: AnalyzeStoryOptions): Promise<StoryD
       messages: [
         {
           role: 'system',
-          content: 'You are a helpful storytelling coach who extracts key story elements. Always respond with valid JSON.'
+          content:
+            'You are a helpful storytelling coach who extracts key story elements. Always respond with valid JSON.',
         },
         {
           role: 'user',
-          content: prompt
-        }
+          content: prompt,
+        },
       ],
       temperature: 0.3,
       max_tokens: 1000,
     });
 
     const response = completion.choices[0]?.message?.content || '';
-    
+
     // Track tokens for cost optimization
     if (completion.usage) {
       trackApiCall(completion.usage.total_tokens);
@@ -84,14 +84,14 @@ export async function storyNeedsAnalysis(storyId: string): Promise<boolean> {
     .select('id')
     .eq('story_id', storyId)
     .single();
-  
+
   return !data;
 }
 
 // Update story details after user edits
 export async function updateStoryDetails(
-  storyId: string, 
-  updates: Partial<StoryDetails>
+  storyId: string,
+  updates: Partial<StoryDetails>,
 ): Promise<boolean> {
   const { error } = await supabase
     .from('story_details')
