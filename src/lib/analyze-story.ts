@@ -7,7 +7,6 @@ export interface AnalyzeStoryOptions {
   storyId: string;
   storyText: string;
   userId: string;
-  onSuccess?: () => void;
   onError?: (error: string) => void;
 }
 

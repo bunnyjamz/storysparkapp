@@ -47,7 +47,10 @@ export default function DashboardPage() {
   }, [sortField, sortOrder]);
 
   useEffect(() => {
-    fetchStories();
+    const loadStories = async () => {
+      await fetchStories();
+    };
+    loadStories();
   }, [fetchStories]);
 
   const toggleSortOrder = () => {

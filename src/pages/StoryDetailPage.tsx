@@ -252,7 +252,6 @@ export default function StoryDetailPage() {
                   if (result) {
                     setStoryDetails(result);
                   }
-                  setAnalyzing(false);
                 }}
                 disabled={analyzing}
               >
