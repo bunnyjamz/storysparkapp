@@ -7,36 +7,52 @@ StorySpark is a mobile-first web app designed as a storytelling coach and story-
 - **Frontend:** React (TypeScript) + Vite
 - **Styling:** Tailwind CSS + shadcn/ui
 - **Backend/Auth:** Supabase (PostgreSQL)
-- **AI:** OpenAI GPT-3.5-turbo for story analysis
+- **AI:** Vercel AI Gateway (OpenAI GPT-3.5-turbo) for story analysis
 - **Deployment:** Vercel
 
 ## Local Setup
 
 1. **Clone the repository:**
+
    ```bash
    git clone <repo-url>
    cd storyspark
    ```
 
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 3. **Environment Variables:**
    Copy `.env.example` to `.env.local` and fill in your credentials.
+
    ```bash
    cp .env.example .env.local
    ```
+
    - `VITE_SUPABASE_URL`: Your Supabase Project URL.
    - `VITE_SUPABASE_ANON_KEY`: Your Supabase Anon Key.
-   - `VITE_OPENAI_API_KEY`: Your OpenAI API key (for AI story analysis).
+   - `VERCEL_AI_GATEWAY_TOKEN`: Server-side token used by the Vercel Function at `/api/analyze-story`.
+
+   Note: `VERCEL_AI_GATEWAY_TOKEN` is **not** a `VITE_` variable and should never be exposed to the browser.
 
 4. **Run the development server:**
+
+   UI only (Vite):
+
    ```bash
    npm run dev
    ```
-   Open [http://localhost:3000](http://localhost:3000) (or the port shown in your terminal).
+
+   Full app including the `/api/analyze-story` function (recommended):
+
+   ```bash
+   npx vercel dev
+   ```
+
+   Open the URL shown in your terminal.
 
 ## Supabase Setup
 
@@ -57,33 +73,28 @@ StorySpark is a mobile-first web app designed as a storytelling coach and story-
 - **story_versions**: Version history for future AI improvements.
 - **learning_progress**: Tracks explored storytelling structures.
 
-## OpenAI Setup
+## Vercel AI Gateway Setup
 
-### Getting Your API Key
+StorySpark routes AI requests through a Vercel Function at `/api/analyze-story`, which then calls the Vercel AI Gateway. This keeps API keys off the client.
 
-1. Go to [OpenAI Platform](https://platform.openai.com/api-keys)
-2. Create a new API key
-3. Add it to `.env.local` as `VITE_OPENAI_API_KEY`
+### 1) Configure OpenAI in Vercel
 
-### Cost Information
+1. In Vercel, open your project.
+2. Go to **Project Settings → AI Gateway**.
+3. Add **OpenAI** as a provider and paste your OpenAI API key.
+4. (Optional) Add your OpenAI Organization ID if your account requires it.
 
-StorySpark uses OpenAI's GPT-3.5-turbo model for cost-efficient story analysis:
+### 2) Add the Gateway token env var
 
-- **Estimated cost per story:** ~$0.0005 (0.5 cents)
-- **Tokens per analysis:** ~500 tokens
-- **Model:** gpt-3.5-turbo
+In Vercel: **Project Settings → Environment Variables**
 
-Cost tracking is logged to the console during development. The implementation includes:
-- Token usage tracking
-- Cost estimation
-- Error handling for rate limits
+- `VERCEL_AI_GATEWAY_TOKEN` (Vercel generates this)
 
-### Rate Limits
+Do **not** use `VITE_OPENAI_API_KEY` anymore.
 
-OpenAI has rate limits based on your tier. The app handles:
-- 429 (rate limit) errors with retry suggestions
-- Network timeouts with appropriate messages
-- Invalid API key errors
+### Cost / Rate Limits
+
+The app still tracks token usage (when available) and handles common error statuses like 429 (rate limit) and 5xx (provider errors). Vercel AI Gateway provides request monitoring and rate limiting controls in the dashboard.
 
 ## Features (Phase 1)
 
@@ -115,6 +126,6 @@ OpenAI has rate limits based on your tier. The app handles:
 ## Troubleshooting
 
 - **Supabase Credentials:** Ensure `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are correctly set in `.env.local`.
-- **OpenAI API Key:** Ensure `VITE_OPENAI_API_KEY` is set for AI features to work.
+- **AI Gateway Token:** Ensure `VERCEL_AI_GATEWAY_TOKEN` is set in your Vercel project for AI features to work.
 - **TypeScript Errors:** Run `npm run build` to check for type issues.
 - **Linting:** Run `npm run lint` to find and fix code style issues.

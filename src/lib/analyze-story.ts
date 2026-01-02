@@ -1,7 +1,33 @@
-import { openai, getOpenAIErrorMessage } from './openai';
-import { formatStoryAnalysisPrompt, parseStoryAnalysisResponse, trackApiCall } from './ai-prompts';
+import { parseStoryAnalysisResponse, trackApiCall } from './ai-prompts';
 import { supabase } from './supabase';
 import { StoryDetails } from '@/types';
+
+type AnalyzeStoryApiResponse = {
+  content: string;
+  usage?: {
+    total_tokens?: number;
+  };
+  error?: string;
+};
+
+function getAnalyzeStoryErrorMessage(status: number, fallback?: string): string {
+  switch (status) {
+    case 400:
+      return fallback || 'Invalid request. Please try again.';
+    case 401:
+    case 403:
+      return fallback || 'AI service not configured. Please contact support.';
+    case 429:
+      return 'Rate limit exceeded. Please try again in a moment.';
+    case 500:
+    case 502:
+    case 503:
+    case 504:
+      return fallback || 'AI service error. Please try again later.';
+    default:
+      return fallback || 'An unexpected error occurred while analyzing your story.';
+  }
+}
 
 export interface AnalyzeStoryOptions {
   storyId: string;
@@ -14,30 +40,29 @@ export async function analyzeStory(options: AnalyzeStoryOptions): Promise<StoryD
   const { storyId, storyText, onError } = options;
 
   try {
-    const prompt = formatStoryAnalysisPrompt(storyText);
-
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are a helpful storytelling coach who extracts key story elements. Always respond with valid JSON.',
-        },
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      temperature: 0.3,
-      max_tokens: 1000,
+    const apiRes = await fetch('/api/analyze-story', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        storyId,
+        storyText,
+      }),
     });
 
-    const response = completion.choices[0]?.message?.content || '';
+    const result = (await apiRes.json().catch(() => ({}))) as Partial<AnalyzeStoryApiResponse>;
 
-    // Track tokens for cost optimization
-    if (completion.usage) {
-      trackApiCall(completion.usage.total_tokens);
+    if (!apiRes.ok) {
+      const errorMessage = getAnalyzeStoryErrorMessage(apiRes.status, result.error);
+      onError?.(errorMessage);
+      return null;
+    }
+
+    const response = result.content || '';
+
+    if (result.usage?.total_tokens) {
+      trackApiCall(result.usage.total_tokens);
     }
 
     const analysisResult = parseStoryAnalysisResponse(response);
@@ -71,8 +96,7 @@ export async function analyzeStory(options: AnalyzeStoryOptions): Promise<StoryD
     return storyDetails as StoryDetails;
   } catch (error) {
     console.error('Error analyzing story:', error);
-    const errorMessage = getOpenAIErrorMessage(error);
-    onError?.(errorMessage);
+    onError?.('An unexpected error occurred while analyzing your story.');
     return null;
   }
 }
