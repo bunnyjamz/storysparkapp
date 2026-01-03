@@ -40,13 +40,12 @@ export async function analyzeStory(options: AnalyzeStoryOptions): Promise<StoryD
   const { storyId, storyText, onError } = options;
 
   try {
-    const apiRes = await fetch('/api/analyze-story', {
+    const apiRes = await fetch('/api/analyze', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        storyId,
         storyText,
       }),
     });
